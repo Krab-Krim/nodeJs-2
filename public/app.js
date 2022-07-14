@@ -6,35 +6,30 @@ document.addEventListener('click', event => {
             event.target.closest('li').remove()
         })
     }
-})
 
-document.addEventListener('click', event => {
     if (event.target.dataset.type === 'edit') {
         const id = event.target.dataset.id
         const title = event.target.dataset.title
-        const list = document.querySelector(".list-group-item span")
-
-        const data = window.prompt("Введите новое название", `${title}`)
-
-        put(id, data)
-            .then(()=> {
-                list.innerHTML = data
+        const newTitle = prompt('Введите новое название', title)
+        if (newTitle !== null) {
+            update({ id, title: newTitle }).then(() => {
+                event.target.closest('li').querySelector('span').innerText = newTitle
             })
+        }
     }
 })
 
-async function remove(id) {
-    await fetch(`/${id}`, {method: 'DELETE'})
+async function update(newNote) {
+    await fetch(`/${newNote.id}`, {
+        method: 'PUT',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newNote)
+    })
 }
 
-async function put(id, data) {
-  console.log("datadatadata", data)
-  await fetch(`/${id}`, {
-    method: "PUT",
-    headers: {"Accept": "application/json", "Content-Type": "application/json"},
-    body: JSON.stringify({
-      id: id,
-      title: data,
-    })
-  })
+async function remove(id) {
+    await fetch(`/${id}`, {method: 'DELETE'})
 }
